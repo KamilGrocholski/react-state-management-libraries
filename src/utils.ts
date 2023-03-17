@@ -1,6 +1,13 @@
+export const STATUS = {
+    DONE: 'done',
+    IN_PROGRESS: 'in progress',
+    TO_DO: 'to do',
+    HOLD: 'hold',
+} as const
+
 export type Todo = {
     id: string
-    status: 'complete' | 'in progress' | 'awating' | 'hold'
+    status: typeof STATUS[keyof typeof STATUS]
     name: string
     progress: number
     startDate: number

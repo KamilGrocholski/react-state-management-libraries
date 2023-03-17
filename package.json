@@ -10,10 +10,14 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.3",
+    "framer-motion": "^10.5.0",
     "jotai": "^2.0.3",
+    "mobx": "^6.8.0",
+    "mobx-react": "^7.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
+    "recoil": "^0.7.7",
     "valtio": "^1.10.3",
     "zustand": "^4.3.6"
   },

@@ -1,0 +1,34 @@
+import store, { type StoreType } from '../stores/mobx'
+import Template from './Template'
+import { observer } from 'mobx-react'
+
+const MobxCore = ({ store }: { store: StoreType }) => {
+    return (
+        <Template
+            name='Mobx'
+            version='2'
+            state={{
+                todos: store.todos,
+            }}
+            actions={{
+                add(todo) {
+                    store.add(todo)
+                },
+                remove(id) {
+                    store.remove(id)
+                },
+                update(id, updatedTodo) {
+                    store.update(id, updatedTodo)
+                },
+            }}
+        />
+    )
+}
+
+const Observer = observer(MobxCore)
+
+const Mobx = () => {
+    return <Observer store={store} />
+}
+
+export default Mobx
