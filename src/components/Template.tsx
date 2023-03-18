@@ -1,9 +1,15 @@
-import { useReducer, useState } from 'react'
-import { State, Actions, Todo, InputTodo, STATUS } from '../utils'
+import { useState } from 'react'
+import {
+    type State,
+    type Actions,
+    type Todo,
+    STATUS,
+    todoSchema,
+    generateUniqueTodoId,
+} from '../utils'
 import Modal from './Modal'
-
-type InputTodoErrorState = { [key in keyof InputTodo]?: string }
-type TodoErrorState = { [key in keyof Todo]?: string }
+import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const Template: React.FC<{
     state: State
@@ -17,12 +23,13 @@ const Template: React.FC<{
             <h2>{version}</h2>
 
             <CreateTodoForm
-                onValid={(todo) => actions.add(todo)}
-                onError={console.log}
-                initialState={{
-                    name: 'Name',
-                    progress: 0,
-                    status: 'in progress',
+                onValid={(validTodo, e) => {
+                    e?.preventDefault()
+                    actions.add(validTodo)
+                }}
+                onError={(invalidTodo, e) => {
+                    e?.preventDefault()
+                    console.log(invalidTodo)
                 }}
             />
             {state.todos.map((todo) => (
@@ -48,8 +55,15 @@ const TodoComponent: React.FC<{
         <div className='todo-component-container'>
             <Modal isOpen={isEditing} handleClose={() => setIsEditing(false)}>
                 <UpdateTodoForm
-                    onValid={(validTodo) => update(validTodo.id, validTodo)}
-                    onError={console.log}
+                    onValid={(validTodo, e) => {
+                        e?.preventDefault()
+                        update(validTodo.id, validTodo)
+                        setIsEditing(false)
+                    }}
+                    onError={(invalidTodo, e) => {
+                        e?.preventDefault()
+                        console.log(invalidTodo)
+                    }}
                     initialState={{ ...todo }}
                 />
             </Modal>
@@ -78,113 +92,130 @@ const TodoComponent: React.FC<{
 }
 
 const UpdateTodoForm: React.FC<{
-    onValid(todo: Todo): void
-    onError(todo: Partial<Todo>): void
+    onValid: SubmitHandler<Todo>
+    onError: SubmitErrorHandler<Todo>
     initialState: Todo
 }> = ({ onValid, onError, initialState }) => {
-    const [todo, setTodo] = useReducer<
-        (prev: Todo, update: Partial<Todo>) => Todo
-    >((prev, update) => ({ ...prev, ...update }), initialState)
-
-    const [errorState, setErrorState] = useReducer<
-        (
-            prev: TodoErrorState,
-            update: Partial<TodoErrorState>
-        ) => TodoErrorState
-    >((prev, update) => ({ ...prev, ...update }), {})
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        setErrorState(validateInputTodo(todo))
-
-        if (Object.keys(errorState).length === 0) {
-            onValid(todo)
-            return
-        }
-
-        onError(todo)
-    }
+    const {
+        handleSubmit,
+        register,
+        formState: { errors },
+    } = useForm<Todo>({
+        defaultValues: {
+            ...initialState,
+        },
+        resolver: zodResolver(todoSchema),
+    })
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label htmlFor={'name'}></label>
-            <input
-                id='name'
-                value={todo.name ?? ''}
-                onChange={(e) => setTodo({ name: e.target.value })}
-            />
-            <p>{errorState.name}</p>
+        <form onSubmit={handleSubmit(onValid, onError)}>
+            <label htmlFor={'name'}>Name</label>
+            <input id='name' {...register('name')} type='text' />
+            <p>{errors.name?.message}</p>
 
-            <label htmlFor={'status'}></label>
-            <select
-                id='status'
-                value={todo.status}
-                onChange={(e) =>
-                    setTodo({ status: e.target.value as Todo['status'] })
-                }
-            >
-                {Object.entries(STATUS).map(([key, value]) => (
-                    <option>{value}</option>
+            <label htmlFor={'progress'}>Progress</label>
+            <input
+                id='progress'
+                {...register('progress', { valueAsNumber: true })}
+                type='number'
+            />
+            <p>{errors.progress?.message}</p>
+
+            <label htmlFor={'startDate'}>Start date</label>
+            <input
+                id='startDate'
+                {...register('startDate', { valueAsDate: true })}
+                type='datetime-local'
+            />
+            <p>{errors.startDate?.message}</p>
+
+            <label htmlFor={'status'}>Status</label>
+            <select id='status' {...register('status')}>
+                {Object.values(STATUS).map((status) => (
+                    <option key={status}>{status}</option>
                 ))}
             </select>
-            <p>{errorState.status}</p>
+            <p>{errors.status?.message}</p>
 
-            <button>Add</button>
+            <label htmlFor={'terminDate'}>Termin date</label>
+            <input
+                id='terminDate'
+                {...register('terminDate', { valueAsDate: true })}
+                type='datetime-local'
+            />
+            <p>{errors.terminDate?.message}</p>
+
+            <button>Update</button>
         </form>
     )
 }
 
 const CreateTodoForm: React.FC<{
-    onValid(todo: InputTodo): void
-    onError(todo: Partial<InputTodo>): void
-    initialState: InputTodo
+    onValid: SubmitHandler<Todo>
+    onError: SubmitErrorHandler<Todo>
+    initialState?: Todo
 }> = ({ onValid, onError, initialState }) => {
-    const [todo, setTodo] = useReducer<
-        (prev: InputTodo, update: Partial<InputTodo>) => InputTodo
-    >((prev, update) => ({ ...prev, ...update }), initialState)
+    const {
+        register,
+        reset,
+        formState: { errors },
+        handleSubmit,
+    } = useForm<Todo>({
+        defaultValues: {
+            ...initialState,
+            id: generateUniqueTodoId(),
+        },
+        resolver: zodResolver(todoSchema),
+    })
 
-    const [errorState, setErrorState] = useReducer<
-        (
-            prev: InputTodoErrorState,
-            update: Partial<InputTodoErrorState>
-        ) => InputTodoErrorState
-    >((prev, update) => ({ ...prev, ...update }), {})
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-
-        setErrorState(validateTodo(todo))
-
-        if (Object.keys(errorState).length === 0) {
-            onValid(todo)
-            return
-        }
-
-        onError(todo)
+    function handleReset() {
+        reset({
+            id: generateUniqueTodoId(),
+            ...initialState,
+        })
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <label htmlFor={'name'}></label>
-            <input
-                id='name'
-                value={todo.name ?? ''}
-                onChange={(e) => setTodo({ name: e.target.value })}
-            />
-            <p>{errorState.name}</p>
+        <form onSubmit={handleSubmit(onValid, onError)}>
+            <label htmlFor={'name'}>Name</label>
+            <input id='name' {...register('name')} type='text' />
+            <p>{errors.name?.message}</p>
 
-            <button>Add</button>
+            <label htmlFor={'progress'}>Progress</label>
+            <input
+                id='progress'
+                {...register('progress', { valueAsNumber: true })}
+                type='number'
+            />
+            <p>{errors.progress?.message}</p>
+
+            <label htmlFor={'startDate'}>Start date</label>
+            <input
+                id='startDate'
+                {...register('startDate', { valueAsDate: true })}
+                type='datetime-local'
+            />
+            <p>{errors.progress?.message}</p>
+
+            <label htmlFor={'status'}>Status</label>
+            <select id='status' {...register('status')}>
+                {Object.values(STATUS).map((status) => (
+                    <option key={status}>{status}</option>
+                ))}
+            </select>
+            <p>{errors.status?.message}</p>
+
+            <label htmlFor={'terminDate'}>Termin date</label>
+            <input
+                id='terminDate'
+                {...register('terminDate', { valueAsDate: true })}
+                type='datetime-local'
+            />
+            <p>{errors.terminDate?.message}</p>
+
+            <button onClick={handleReset}>Add</button>
         </form>
     )
-}
-
-function validateInputTodo(todo: Partial<InputTodo>): InputTodoErrorState {
-    return {}
-}
-
-function validateTodo(todo: Partial<Todo>): TodoErrorState {
-    return {}
 }
 
 function formatDate(date: number | Date | string): string {

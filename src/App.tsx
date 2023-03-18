@@ -1,11 +1,10 @@
 import './App.css'
-import Redux from './components/Redux'
-import Zustand from './components/Zustand'
-import Valtio from './components/Valtio'
-import { useReducer, useState } from 'react'
-import Jotai from './components/Jotai'
-import Recoil from './components/Recoil'
-import Mobx from './components/Mobx'
+import { useState } from 'react'
+import Jotai from './components/StateLibrariesComponents/Jotai'
+import Mobx from './components/StateLibrariesComponents/Mobx'
+import Redux from './components/StateLibrariesComponents/Redux'
+import Valtio from './components/StateLibrariesComponents/Valtio'
+import Zustand from './components/StateLibrariesComponents/Zustand'
 
 const TabsMap = {
     Zustand,

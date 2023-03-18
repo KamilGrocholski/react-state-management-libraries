@@ -1,3 +1,7 @@
+import { z } from 'zod'
+
+export type Todo = z.output<typeof todoSchema>
+
 export const STATUS = {
     DONE: 'done',
     IN_PROGRESS: 'in progress',
@@ -5,37 +9,32 @@ export const STATUS = {
     HOLD: 'hold',
 } as const
 
-export type Todo = {
-    id: string
-    status: typeof STATUS[keyof typeof STATUS]
-    name: string
-    progress: number
-    startDate: number
-    completeDate?: number
-    terminDate?: number
-}
-
-export type InputTodo = Pick<
-    Todo,
-    'status' | 'progress' | 'terminDate' | 'name'
->
-
 export type State = {
     todos: Todo[]
 }
 
 export type Actions = {
-    add(todo: InputTodo): void
-    update(id: Todo['id'], updatedTodo: InputTodo): void
+    add(todo: Todo): void
+    update(id: Todo['id'], todo: Todo): void
     remove(id: Todo['id']): void
 }
 
-export const composeTodo = (inputTodo: InputTodo): Todo => {
-    const createdAt = Date.now()
+export const todoSchema = z.object({
+    id: z.number(),
+    name: z.string(),
+    progress: z.number().min(0).max(100),
+    status: z
+        .literal(STATUS['DONE'])
+        .or(z.literal(STATUS['HOLD']))
+        .or(z.literal(STATUS['IN_PROGRESS']))
+        .or(z.literal(STATUS['TO_DO'])),
+    terminDate: z.date(),
+    startDate: z.date(),
+    completeDate: z.date().optional(),
+})
 
-    return {
-        ...inputTodo,
-        startDate: createdAt,
-        id: createdAt.toString(),
-    }
+export function generateUniqueTodoId(): number {
+    const uniqueId = Date.now()
+
+    return uniqueId
 }

@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@hookform/resolvers": "^2.9.11",
     "@reduxjs/toolkit": "^1.9.3",
     "framer-motion": "^10.5.0",
     "jotai": "^2.0.3",
@@ -16,9 +17,11 @@
     "mobx-react": "^7.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.43.7",
     "react-redux": "^8.0.5",
     "recoil": "^0.7.7",
     "valtio": "^1.10.3",
+    "zod": "^3.21.4",
     "zustand": "^4.3.6"
   },
   "devDependencies": {

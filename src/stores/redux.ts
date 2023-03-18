@@ -1,13 +1,12 @@
 import { PayloadAction, configureStore, createSlice } from '@reduxjs/toolkit'
-import { InputTodo, State, Todo, composeTodo } from '../utils'
+import { State, Todo, composeTodo } from '../utils'
 
 const todosSlice = createSlice({
     name: 'todos',
     initialState: { todos: [] } as State,
     reducers: {
-        add(state, action: PayloadAction<InputTodo>) {
-            const newTodo = composeTodo(action.payload)
-            state.todos.push(newTodo)
+        add(state, action: PayloadAction<Todo>) {
+            state.todos.push(action.payload)
         },
         remove(state, action: PayloadAction<string>) {
             state.todos = state.todos.filter(
@@ -16,7 +15,7 @@ const todosSlice = createSlice({
         },
         update(
             state,
-            action: PayloadAction<{ id: string; updatedTodo: InputTodo }>
+            action: PayloadAction<{ id: string; updatedTodo: Todo }>
         ) {
             state.todos = state.todos.map((todo) => {
                 if (todo.id === action.payload.id) {

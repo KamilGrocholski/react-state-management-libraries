@@ -95,8 +95,8 @@ input {
 }
 
 input:hover {
-    border: 1px solid;
-    border-color: var(--color-highlight-high);
+    outline: 1px solid;
+    outline-color: var(--color-highlight-high);
     box-shadow: 0 0 1rem 0.1rem var(--color-highlight-high);
 }
 

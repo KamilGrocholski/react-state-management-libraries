@@ -1,5 +1,5 @@
-import store, { actions } from '../stores/valtio'
-import Template from './Template'
+import store, { actions } from '../../stores/valtio'
+import Template from '../Template'
 import { useSnapshot } from 'valtio'
 
 const Valtio = () => {

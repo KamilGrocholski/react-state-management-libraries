@@ -1,26 +1,23 @@
-import Template from './Template'
-import todosAtom from '../stores/jotai'
-import { useAtom } from 'jotai'
-import { composeTodo } from '../utils'
+import { useRecoilState } from 'recoil'
+import todosAtom from '../../stores/recoil'
+import Template from '../Template'
 
-const Jotai = () => {
-    const [todos, setTodos] = useAtom(todosAtom)
+const Recoil = () => {
+    const [todos, setTodos] = useRecoilState(todosAtom)
 
     return (
         <Template
-            name='Jotai'
+            name='Recoil'
             version='2'
             state={{
-                todos,
+                todos: [...todos],
             }}
             actions={{
                 add(todo) {
-                    const newTodo = composeTodo(todo)
-                    setTodos([...todos, newTodo])
+                    setTodos([...todos, todo])
                 },
                 remove(id) {
-                    const newTodos = todos.filter((todo) => todo.id !== id)
-                    setTodos(newTodos)
+                    setTodos(todos.filter((todo) => todo.id !== id))
                 },
                 update(id, updatedTodo) {
                     const newTodos = todos.map((todo) => {
@@ -41,4 +38,4 @@ const Jotai = () => {
     )
 }
 
-export default Jotai
+export default Recoil

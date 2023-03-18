@@ -1,5 +1,5 @@
-import { RootState, AppDispatch, add, remove, update } from '../stores/redux'
-import Template from './Template'
+import { RootState, AppDispatch, add, remove, update } from '../../stores/redux'
+import Template from '../Template'
 import { useDispatch, useSelector } from 'react-redux'
 
 const Redux = () => {

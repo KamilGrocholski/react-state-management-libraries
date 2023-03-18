@@ -1,5 +1,5 @@
-import store from '../stores/zustand'
-import Template from './Template'
+import store from '../../stores/zustand'
+import Template from '../Template'
 
 const Zustand = () => {
     const todos = store((state) => state.todos)

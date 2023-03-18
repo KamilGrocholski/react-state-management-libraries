@@ -1,6 +1,7 @@
-import store, { type StoreType } from '../stores/mobx'
-import Template from './Template'
 import { observer } from 'mobx-react'
+import { type StoreType } from '../../stores/mobx'
+import store from '../../stores/mobx'
+import Template from '../Template'
 
 const MobxCore = ({ store }: { store: StoreType }) => {
     return (

@@ -1,5 +1,5 @@
 import { proxy } from 'valtio'
-import { Actions, State, composeTodo } from '../utils'
+import { Actions, State } from '../utils'
 
 const store = proxy<State>({
     todos: [],
@@ -7,8 +7,7 @@ const store = proxy<State>({
 
 export const actions: Actions = {
     add(todo) {
-        const newTodo = composeTodo(todo)
-        store.todos.push(newTodo)
+        store.todos.push(todo)
     },
     remove(id) {
         store.todos = store.todos.filter((todo) => todo.id !== id)

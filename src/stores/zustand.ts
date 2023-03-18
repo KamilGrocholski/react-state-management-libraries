@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { composeTodo, type Actions, type State } from '../utils'
+import { type Actions, type State } from '../utils'
 
 const store = create<State & Actions>((set, get) => ({
     todos: [],
@@ -7,7 +7,7 @@ const store = create<State & Actions>((set, get) => ({
     add(todo) {
         set((state) => ({
             ...state,
-            todos: [...state.todos, composeTodo(todo)],
+            todos: [...state.todos, todo],
         }))
     },
     update(id, updatedTodo) {
