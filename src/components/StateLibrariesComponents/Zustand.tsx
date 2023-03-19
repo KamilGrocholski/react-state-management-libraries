@@ -10,9 +10,9 @@ const Zustand = () => {
     return (
         <Template
             name='Zustand'
-            version='2'
+            version='4.3.6'
             state={{
-                todos,
+                todos: [...todos],
             }}
             actions={{
                 add,

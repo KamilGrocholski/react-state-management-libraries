@@ -8,9 +8,9 @@ const Jotai = () => {
     return (
         <Template
             name='Jotai'
-            version='2'
+            version='2.0.3'
             state={{
-                todos,
+                todos: [...todos],
             }}
             actions={{
                 add(todo) {

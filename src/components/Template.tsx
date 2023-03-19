@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 import {
     type State,
     type Actions,
@@ -10,6 +10,9 @@ import {
 import Modal from './Modal'
 import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { BsTrash } from 'react-icons/bs'
+import { FaRegEdit } from 'react-icons/fa'
+import useScrollToBottom from '../hooks/useScrollToBottom'
 
 const Template: React.FC<{
     state: State
@@ -17,79 +20,122 @@ const Template: React.FC<{
     name: string
     version: string
 }> = ({ state, actions, name, version }) => {
+    const [isAdding, setIsAdding] = useState(false)
+    const [willBeAdded, setWillBeAdded] = useState(false)
+    const todoListRef = useRef<HTMLDivElement | null>(null)
+    const scrollToBottomOfTodoList = useScrollToBottom(todoListRef)
+
+    useEffect(() => {
+        if (willBeAdded) {
+            scrollToBottomOfTodoList()
+            setWillBeAdded(false)
+        }
+    }, [state.todos])
+
     return (
         <div className='template-container'>
             <h1>{name}</h1>
             <h2>{version}</h2>
-
-            <CreateTodoForm
-                onValid={(validTodo, e) => {
-                    e?.preventDefault()
-                    actions.add(validTodo)
-                }}
-                onError={(invalidTodo, e) => {
-                    e?.preventDefault()
-                    console.log(invalidTodo)
-                }}
-            />
-            {state.todos.map((todo) => (
-                <TodoComponent
-                    key={todo.id}
-                    todo={todo}
-                    update={actions.update}
-                    remove={actions.remove}
-                />
-            ))}
-        </div>
-    )
-}
-
-const TodoComponent: React.FC<{
-    todo: Todo
-    update: Actions['update']
-    remove: Actions['remove']
-}> = ({ todo, update, remove }) => {
-    const [isEditing, setIsEditing] = useState(false)
-
-    return (
-        <div className='todo-component-container'>
-            <Modal isOpen={isEditing} handleClose={() => setIsEditing(false)}>
-                <UpdateTodoForm
+            <Modal isOpen={isAdding} handleClose={() => setIsAdding(false)}>
+                <CreateTodoForm
                     onValid={(validTodo, e) => {
                         e?.preventDefault()
-                        update(validTodo.id, validTodo)
-                        setIsEditing(false)
+                        setWillBeAdded(true)
+                        actions.add(validTodo)
+                        setIsAdding(false)
                     }}
                     onError={(invalidTodo, e) => {
                         e?.preventDefault()
                         console.log(invalidTodo)
                     }}
-                    initialState={{ ...todo }}
                 />
             </Modal>
-            <span>{todo.name}</span>
-            <span>{todo.progress}</span>
-            <span
-                className={`todo-status ${
-                    todo.status === 'done'
-                        ? 'todo-status-done'
-                        : todo.status === 'hold'
-                        ? 'todo-status-hold'
-                        : todo.status === 'in progress'
-                        ? 'todo-status-inprogress'
-                        : 'todo-status-todo'
-                }`}
-            >
-                {todo.status}
-            </span>
-            <span>{formatDate(todo.startDate)}</span>
-            <span>{formatDate(todo.terminDate ?? '')}</span>
-            <span>{formatDate(todo.completeDate ?? '')}</span>
-            <button onClick={() => setIsEditing((prev) => !prev)}>Edit</button>
-            <button onClick={() => remove(todo.id)}>Remove</button>
+            <div className='todos-list'>
+                <button
+                    className='todo-add-btn'
+                    onClick={() => setIsAdding(true)}
+                >
+                    Add
+                </button>
+                {state.todos.map((todo) => (
+                    <TodoComponent
+                        ref={todoListRef}
+                        key={todo.id}
+                        todo={todo}
+                        update={actions.update}
+                        remove={actions.remove}
+                    />
+                ))}
+            </div>
         </div>
     )
 }
+
+type TodoComponentProps = {
+    todo: Todo
+    update: Actions['update']
+    remove: Actions['remove']
+}
+
+const TodoComponent = forwardRef<HTMLDivElement, TodoComponentProps>(
+    ({ todo, update, remove }, ref) => {
+        const [isEditing, setIsEditing] = useState(false)
+
+        return (
+            <div className='todo-component-container' ref={ref}>
+                <Modal
+                    isOpen={isEditing}
+                    handleClose={() => setIsEditing(false)}
+                >
+                    <UpdateTodoForm
+                        onValid={(validTodo, e) => {
+                            e?.preventDefault()
+                            update(validTodo.id, validTodo)
+                            setIsEditing(false)
+                        }}
+                        onError={(invalidTodo, e) => {
+                            e?.preventDefault()
+                            console.log(invalidTodo)
+                        }}
+                        initialState={{ ...todo }}
+                    />
+                </Modal>
+                <span className='todo-name'>{todo.name}</span>
+                <span className='todo-progress'>{todo.progress}%</span>
+                <span
+                    className={`todo-status ${
+                        todo.status === 'done'
+                            ? 'todo-status-done'
+                            : todo.status === 'hold'
+                            ? 'todo-status-hold'
+                            : todo.status === 'in progress'
+                            ? 'todo-status-inprogress'
+                            : 'todo-status-todo'
+                    }`}
+                >
+                    {todo.status}
+                </span>
+                <span className='todo-start-date'>
+                    {formatDate(todo.startDate)}
+                </span>
+                <div className='todo-actions-container'>
+                    <button
+                        className='btn-edit'
+                        onClick={() => setIsEditing((prev) => !prev)}
+                    >
+                        <FaRegEdit />
+                    </button>
+                    <button
+                        className='btn-remove'
+                        onClick={() => remove(todo.id)}
+                    >
+                        <BsTrash />
+                    </button>
+                </div>
+            </div>
+        )
+    }
+)
 
 const UpdateTodoForm: React.FC<{
     onValid: SubmitHandler<Todo>
@@ -109,41 +155,41 @@ const UpdateTodoForm: React.FC<{
 
     return (
         <form onSubmit={handleSubmit(onValid, onError)}>
-            <label htmlFor={'name'}>Name</label>
-            <input id='name' {...register('name')} type='text' />
-            <p>{errors.name?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'name'}>Name</label>
+                <input id='name' {...register('name')} type='text' />
+                <p>{errors.name?.message}</p>
+            </div>
 
-            <label htmlFor={'progress'}>Progress</label>
-            <input
-                id='progress'
-                {...register('progress', { valueAsNumber: true })}
-                type='number'
-            />
-            <p>{errors.progress?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'progress'}>Progress</label>
+                <input
+                    id='progress'
+                    {...register('progress', { valueAsNumber: true })}
+                    type='number'
+                />
+                <p>{errors.progress?.message}</p>
+            </div>
 
-            <label htmlFor={'startDate'}>Start date</label>
-            <input
-                id='startDate'
-                {...register('startDate', { valueAsDate: true })}
-                type='datetime-local'
-            />
-            <p>{errors.startDate?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'startDate'}>Start date</label>
+                <input
+                    id='startDate'
+                    {...register('startDate', { valueAsDate: true })}
+                    type='datetime-local'
+                />
+                <p>{errors.startDate?.message}</p>
+            </div>
 
-            <label htmlFor={'status'}>Status</label>
-            <select id='status' {...register('status')}>
-                {Object.values(STATUS).map((status) => (
-                    <option key={status}>{status}</option>
-                ))}
-            </select>
-            <p>{errors.status?.message}</p>
-
-            <label htmlFor={'terminDate'}>Termin date</label>
-            <input
-                id='terminDate'
-                {...register('terminDate', { valueAsDate: true })}
-                type='datetime-local'
-            />
-            <p>{errors.terminDate?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'status'}>Status</label>
+                <select id='status' {...register('status')}>
+                    {Object.values(STATUS).map((status) => (
+                        <option key={status}>{status}</option>
+                    ))}
+                </select>
+                <p>{errors.status?.message}</p>
+            </div>
 
             <button>Update</button>
         </form>
@@ -164,6 +210,7 @@ const CreateTodoForm: React.FC<{
         defaultValues: {
             ...initialState,
             id: generateUniqueTodoId(),
+            progress: 0,
         },
         resolver: zodResolver(todoSchema),
     })
@@ -177,48 +224,51 @@ const CreateTodoForm: React.FC<{
 
     return (
         <form onSubmit={handleSubmit(onValid, onError)}>
-            <label htmlFor={'name'}>Name</label>
-            <input id='name' {...register('name')} type='text' />
-            <p>{errors.name?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'name'}>Name</label>
+                <input id='name' {...register('name')} type='text' />
+                <p>{errors.name?.message}</p>
+            </div>
 
-            <label htmlFor={'progress'}>Progress</label>
-            <input
-                id='progress'
-                {...register('progress', { valueAsNumber: true })}
-                type='number'
-            />
-            <p>{errors.progress?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'progress'}>Progress</label>
+                <input
+                    id='progress'
+                    {...register('progress', { valueAsNumber: true })}
+                    type='number'
+                />
+                <p>{errors.progress?.message}</p>
+            </div>
 
-            <label htmlFor={'startDate'}>Start date</label>
-            <input
-                id='startDate'
-                {...register('startDate', { valueAsDate: true })}
-                type='datetime-local'
-            />
-            <p>{errors.progress?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'startDate'}>Start date</label>
+                <input
+                    id='startDate'
+                    {...register('startDate', { valueAsDate: true })}
+                    type='datetime-local'
+                />
+                <p>{errors.startDate?.message}</p>
+            </div>
 
-            <label htmlFor={'status'}>Status</label>
-            <select id='status' {...register('status')}>
-                {Object.values(STATUS).map((status) => (
-                    <option key={status}>{status}</option>
-                ))}
-            </select>
-            <p>{errors.status?.message}</p>
-
-            <label htmlFor={'terminDate'}>Termin date</label>
-            <input
-                id='terminDate'
-                {...register('terminDate', { valueAsDate: true })}
-                type='datetime-local'
-            />
-            <p>{errors.terminDate?.message}</p>
+            <div className='form-field'>
+                <label htmlFor={'status'}>Status</label>
+                <select id='status' {...register('status')}>
+                    {Object.values(STATUS).map((status) => (
+                        <option key={status}>{status}</option>
+                    ))}
+                </select>
+                <p>{errors.status?.message}</p>
+            </div>
 
             <button onClick={handleReset}>Add</button>
         </form>
     )
 }
 
-function formatDate(date: number | Date | string): string {
+function formatDate(date?: Date): string {
+    if (date === undefined) {
+        return '---'
+    }
     const dateObject = new Date(date)
 
     return dateObject.toLocaleString()

@@ -10,9 +10,9 @@ const Redux = () => {
     return (
         <Template
             name='Redux'
-            version='8'
+            version='8.0.5'
             state={{
-                todos,
+                todos: [...todos],
             }}
             actions={{
                 add(todo) {

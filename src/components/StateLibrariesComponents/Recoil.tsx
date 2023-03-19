@@ -8,7 +8,7 @@ const Recoil = () => {
     return (
         <Template
             name='Recoil'
-            version='2'
+            version='0.7.7'
             state={{
                 todos: [...todos],
             }}
