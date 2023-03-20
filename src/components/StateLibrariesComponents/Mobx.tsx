@@ -7,9 +7,9 @@ const MobxCore = ({ store }: { store: StoreType }) => {
     return (
         <Template
             name='Mobx'
-            version='2'
+            version='6.8.0'
             state={{
-                todos: store.todos,
+                todos: [...store.todos],
             }}
             actions={{
                 add(todo) {

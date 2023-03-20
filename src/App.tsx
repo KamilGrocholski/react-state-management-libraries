@@ -1,10 +1,11 @@
-import './App.css'
 import { useState } from 'react'
+import './App.css'
 import Jotai from './components/StateLibrariesComponents/Jotai'
 import Mobx from './components/StateLibrariesComponents/Mobx'
 import Redux from './components/StateLibrariesComponents/Redux'
 import Valtio from './components/StateLibrariesComponents/Valtio'
 import Zustand from './components/StateLibrariesComponents/Zustand'
+// import Recoil from './components/StateLibrariesComponents/Recoil'
 
 const TabsMap = {
     Zustand,

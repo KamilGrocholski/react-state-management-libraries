@@ -21,16 +21,17 @@ export type Actions = {
 
 export const todoSchema = z.object({
     id: z.number(),
-    name: z.string(),
+    name: z
+        .string()
+        .min(1, { message: 'Must be at least 1 character' })
+        .max(255, { message: 'At most 255 characters' }),
     progress: z.number().min(0).max(100),
     status: z
         .literal(STATUS['DONE'])
         .or(z.literal(STATUS['HOLD']))
         .or(z.literal(STATUS['IN_PROGRESS']))
         .or(z.literal(STATUS['TO_DO'])),
-    terminDate: z.date(),
     startDate: z.date(),
-    completeDate: z.date().optional(),
 })
 
 export function generateUniqueTodoId(): number {

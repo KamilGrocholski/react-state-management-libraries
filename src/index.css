@@ -28,6 +28,22 @@
     -webkit-text-size-adjust: 100%;
 }
 
+/* width */
+::-webkit-scrollbar {
+    width: 0.3rem;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--color-base);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--color-iris);
+    border-radius: 0.3rem;
+}
+
 a {
     font-weight: 500;
     color: var(--color-foam);
@@ -37,17 +53,15 @@ a:hover {
     color: var(--color-pine);
 }
 
-body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 320px;
-    min-height: 100vh;
-}
-
 h1 {
     font-size: 3.2em;
     line-height: 1.1;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.8rem;
+    text-align: center;
 }
 
 .modal-content {
@@ -55,7 +69,8 @@ h1 {
     margin: 15% auto;
     padding: 2rem;
     border: 1px solid var(--color-highlight-high);
-    width: 80%;
+    width: min-content;
+    border-radius: 0.3rem;
 }
 
 .overlay {
@@ -88,19 +103,28 @@ button:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
 }
 
-input {
+input,
+select {
     outline: none;
     border: none;
-    padding: 0.2rem;
+    padding: 0.3rem;
+    border-radius: 0.3rem;
+    background-color: var(--color-highlight-med);
 }
 
-input:hover {
+input:hover,
+select:hover {
     outline: 1px solid;
     outline-color: var(--color-highlight-high);
     box-shadow: 0 0 1rem 0.1rem var(--color-highlight-high);
 }
 
-input:focus {
+.btn-remove {
+    color: var(--color-love);
+}
+
+.btn-edit {
+    color: var(--color-iris);
 }
 
 @media (prefers-color-scheme: light) {
@@ -116,6 +140,21 @@ input:focus {
     }
 }
 
+.form-field {
+    display: flex;
+    flex-direction: column;
+    /* gap: 0.3rem; */
+    align-items: start;
+}
+
+.form-field > label {
+    font-weight: 500;
+}
+
+.form-field > p {
+    color: var(--color-love);
+}
+
 .tab-active {
     box-shadow: 0 0 1rem 0.1rem var(--color-highlight-high);
 }
@@ -124,21 +163,83 @@ input:focus {
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    justify-content: center;
+}
+
+.todos-list {
+    overflow-y: auto;
+    position: relative;
+    max-height: 50vh;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0 1rem 0 1rem;
+    overscroll-behavior-y: none;
+    width: 100%;
+}
+
+.todo-add-btn {
+    margin-bottom: 0.3rem;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(0.5rem);
 }
 
 .todo-component-container {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(4, 20%) 1fr;
+    width: 100%;
     gap: 1rem;
     align-items: center;
     background-color: var(--color-overlay);
-    padding: 0.3rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     border-radius: 0.3rem;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 1440px) {
+    .todo-component-container {
+        display: flex;
+        /* grid-template-columns: repeat(); */
+        flex-direction: column;
+    }
+    .tabs-container {
+        flex-direction: column;
+    }
+}
+
+.todo-actions-container {
+    display: flex;
+    gap: 0.3rem;
+    align-items: center;
+    justify-content: end;
+}
+
+.todo-name {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: start;
+}
+
+.todo-start-date {
+    font-size: 0.8rem;
+}
+
+.todo-progress {
+    text-align: center;
+    width: fit;
 }
 
 .todo-status {
-    padding-inline: 1rem;
     border-radius: 1rem;
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    color: var(--color-base);
 }
 .todo-status-done {
     background-color: var(--color-foam);

@@ -1,5 +1,5 @@
 import { makeAutoObservable } from 'mobx'
-import { type Actions, type State, type Todo, composeTodo } from '../utils'
+import { type Actions, type State, type Todo } from '../utils'
 
 class Store implements Actions, State {
     todos: Todo[] = []
@@ -12,11 +12,11 @@ class Store implements Actions, State {
         this.todos = [...this.todos, todo]
     }
 
-    remove(id: string): void {
+    remove(id: Todo['id']): void {
         this.todos = this.todos.filter((todo) => todo.id !== id)
     }
 
-    update(id: string, updatedTodo: Todo): void {
+    update(id: Todo['id'], updatedTodo: Todo): void {
         this.todos = this.todos.map((todo) => {
             if (todo.id === id) {
                 return {

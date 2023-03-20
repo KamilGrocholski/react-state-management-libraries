@@ -8,7 +8,7 @@ const Valtio = () => {
     return (
         <Template
             name='Valtio'
-            version='2'
+            version='1.10.3'
             state={{
                 todos: [...snap.todos],
             }}

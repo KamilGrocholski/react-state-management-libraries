@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { type Actions, type State } from '../utils'
 
-const store = create<State & Actions>((set, get) => ({
+const store = create<State & Actions>((set) => ({
     todos: [],
 
     add(todo) {
