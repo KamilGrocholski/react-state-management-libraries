@@ -53,17 +53,15 @@ a:hover {
     color: var(--color-pine);
 }
 
-body {
-    margin: 0;
-    display: flex;
-    place-items: center;
-    min-width: 320px;
-    min-height: 100vh;
-}
-
 h1 {
     font-size: 3.2em;
     line-height: 1.1;
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.8rem;
+    text-align: center;
 }
 
 .modal-content {
@@ -164,6 +162,7 @@ select:hover {
     display: flex;
     flex-direction: row;
     gap: 1rem;
+    justify-content: center;
 }
 
 .todos-list {
@@ -174,10 +173,9 @@ select:hover {
     display: flex;
     flex-direction: column;
     gap: 0.3rem;
-    width: 50vw;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding: 0 1rem 0 1rem;
     overscroll-behavior-y: none;
+    width: 100%;
 }
 
 .todo-add-btn {
