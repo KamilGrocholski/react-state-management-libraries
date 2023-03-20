@@ -1,18 +1,18 @@
-import { forwardRef, useEffect, useRef, useState } from 'react'
-import {
-    type State,
-    type Actions,
-    type Todo,
-    STATUS,
-    todoSchema,
-    generateUniqueTodoId,
-} from '../utils'
-import Modal from './Modal'
-import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { forwardRef, useEffect, useRef, useState } from 'react'
+import { SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form'
 import { BsTrash } from 'react-icons/bs'
 import { FaRegEdit } from 'react-icons/fa'
 import useScrollToBottom from '../hooks/useScrollToBottom'
+import {
+    STATUS,
+    generateUniqueTodoId,
+    todoSchema,
+    type Actions,
+    type State,
+    type Todo,
+} from '../utils'
+import Modal from './Modal'
 
 const Template: React.FC<{
     state: State
