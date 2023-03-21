@@ -5,6 +5,7 @@ import Mobx from './components/StateLibrariesComponents/Mobx'
 import Redux from './components/StateLibrariesComponents/Redux'
 import Valtio from './components/StateLibrariesComponents/Valtio'
 import Zustand from './components/StateLibrariesComponents/Zustand'
+import Akita from './components/StateLibrariesComponents/Akita'
 // import Recoil from './components/StateLibrariesComponents/Recoil'
 
 const TabsMap = {
@@ -13,6 +14,7 @@ const TabsMap = {
     Valtio,
     Jotai,
     Mobx,
+    Akita,
     // Recoil,
 } as const
 
